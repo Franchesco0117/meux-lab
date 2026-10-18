@@ -1,0 +1,209 @@
+@startuml Diagrama_Clases_Backend_Portal_Perfecto
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
+skinparam class {
+  BorderColor #185FA5
+  BackgroundColor #E6F1FB
+  FontColor #042C53
+  ArrowColor #185FA5
+  HeaderBackgroundColor #185FA5
+  HeaderFontColor #FFFFFF
+}
+
+skinparam package {
+  BorderColor #888780
+  FontColor #444441
+  BackgroundColor #FAFAFA
+}
+
+skinparam interface {
+  BorderColor #0C447C
+  BackgroundColor #FFFFFF
+  FontColor #042C53
+}
+
+' ─────────────────────────────────────────
+' CAPA 1: DOMAIN
+' ─────────────────────────────────────────
+package "Domain" {
+
+  enum LifecycleState {
+    EDITION
+    PUBLIC
+    FINALIZED
+  }
+
+  interface IUsabilityModule {
+    + initializeTest(projectId: string): boolean
+    + getMetricsSummary(): MetricsContractDto
+    + validateDataStructure(payload: any): boolean
+    + configureParameters(params: object): void
+  }
+
+  class MetricsContractDto {
+    + moduleName: string
+    + createdAt: Date
+    + metricsCounter: number
+    + stateSummary: object
+  }
+
+  interface IProjectRepository {
+    + findById(id: string): Project
+    + findAll(): Project[]
+    + save(project: Project): void
+    + delete(id: string): void
+  }
+
+  interface IUserRepository {
+    + findById(id: string): User
+    + findByEmail(email: string): User
+    + save(user: User): void
+    + delete(id: string): void
+  }
+
+  class Project {
+    - id: string
+    - name: string
+    - createdAt: Date
+    - state: LifecycleState
+    - participantCount: number
+    - moduleType: string
+    + changeState(state: LifecycleState): void
+    + incrementParticipants(): void
+  }
+
+  class User {
+    - id: string
+    - name: string
+    - email: string
+    - passwordHash: string
+    - avatarUrl: string
+    - createdAt: Date
+    + updateProfile(name: string, avatar: string): void
+  }
+
+  Project --> LifecycleState
+  Project "1" --> "1" User : createdBy
+  IUsabilityModule ..> MetricsContractDto : returns
+}
+
+' ─────────────────────────────────────────
+' CAPA 2: APPLICATION
+' ─────────────────────────────────────────
+package "Application" {
+
+  class ProjectService {
+    - projectRepository: IProjectRepository
+    - moduleFactory: ModuleFactory
+    + createProject(name: string, moduleType: string): Project
+    + changeLifecycleState(id: string, state: LifecycleState): void
+    + getProjectMetrics(id: string): MetricsContractDto
+    + generateInvitationLink(id: string): string
+    + deleteProject(id: string): void
+  }
+
+  class AuthService {
+    - userRepository: IUserRepository
+    + register(dto: RegisterDto): User
+    + login(dto: LoginDto): TokenResponse
+    + validateGoogleToken(token: string): User
+    + recoverPassword(email: string): void
+  }
+
+  class ModuleFactory {
+    + create(moduleType: string): IUsabilityModule
+  }
+
+  ProjectService --> IProjectRepository : uses
+  ProjectService --> ModuleFactory : uses
+  AuthService --> IUserRepository : uses
+  ModuleFactory ..> IUsabilityModule : creates
+}
+
+' ─────────────────────────────────────────
+' CAPA 3: INFRASTRUCTURE
+' ─────────────────────────────────────────
+package "Infrastructure" {
+
+  class ProjectRepository {
+    - dataSource: PostgreSQLDataSource
+    + findById(id: string): Project
+    + findAll(): Project[]
+    + save(project: Project): void
+    + delete(id: string): void
+  }
+
+  class UserRepository {
+    - dataSource: PostgreSQLDataSource
+    + findById(id: string): User
+    + findByEmail(email: string): User
+    + save(user: User): void
+    + delete(id: string): void
+  }
+
+  class WebSocketGateway {
+    - connectedClients: Map
+    + handleConnection(client: Socket): void
+    + handleDisconnect(client: Socket): void
+    + handleTelemetryEvent(payload: TelemetryEvent): void
+    + broadcastToResearcher(event: string, data: object): void
+  }
+
+  class TelemetryEvent {
+    - sessionId: string
+    - eventType: string
+    - targetElement: string
+    - timestamp: Date
+    - metadata: JSONB
+  }
+
+  class CardSortingModuleConcrete {
+    + initializeTest(projectId: string): boolean
+    + getMetricsSummary(): MetricsContractDto
+    + validateDataStructure(payload: any): boolean
+    + configureParameters(params: object): void
+  }
+
+  ProjectRepository ..|> IProjectRepository : implements
+  UserRepository ..|> IUserRepository : implements
+  WebSocketGateway --> TelemetryEvent : receives
+  CardSortingModuleConcrete ..|> IUsabilityModule : implements
+}
+
+' ─────────────────────────────────────────
+' CAPA 4: INTERFACES (Controllers)
+' ─────────────────────────────────────────
+package "Interfaces" {
+
+  class ProjectController {
+    - projectService: ProjectService
+    + create(dto: CreateProjectDto): Project
+    + findAll(): Project[]
+    + changeState(id: string, state: LifecycleState): void
+    + generateLink(id: string): string
+    + delete(id: string): void
+  }
+
+  class AuthController {
+    - authService: AuthService
+    + register(dto: RegisterDto): User
+    + login(dto: LoginDto): TokenResponse
+    + loginWithGoogle(token: string): TokenResponse
+    + recoverPassword(email: string): void
+  }
+
+  ProjectController --> ProjectService : delegates
+  AuthController --> AuthService : delegates
+}
+
+' ─────────────────────────────────────────
+' DEPENDENCIAS ENTRE CAPAS
+' ─────────────────────────────────────────
+ProjectService ..> Project : orchestrates
+ProjectRepository ..> Project : persists
+UserRepository ..> User : persists
+
+@enduml
