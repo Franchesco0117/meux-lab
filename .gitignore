@@ -58,3 +58,9 @@ pgdata/
 
 # --- Otros ---
 *.local
+
+# AI assistant files installed by tools (not project code)
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
