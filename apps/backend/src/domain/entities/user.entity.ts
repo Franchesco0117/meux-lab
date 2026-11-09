@@ -1,8 +1,10 @@
+import { Email } from '../value-objects/email.value-object.js';
+
 export class User {
   constructor(
     public readonly id: string,
     public name: string,
-    public email: string,
+    public email: Email,
     public passwordHash: string,
     public avatarUrl: string,
     public readonly createdAt: Date,
