@@ -15,7 +15,8 @@
     "lint:backend": "npm run lint --workspace=apps/backend",
     "lint:frontend": "npm run lint --workspace=apps/frontend",
     "test:backend": "npm run test --workspace=apps/backend",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:generate": "npm run db:generate --workspace=apps/backend"
   },
   "lint-staged": {
     "*.{ts,tsx,js,json,md,css,html,yml,yaml}": "prettier --write"
