@@ -6,7 +6,7 @@ export class User {
     public name: string,
     public email: Email,
     public passwordHash: string,
-    public avatarUrl: string,
+    public avatarUrl: string | null,
     public readonly createdAt: Date,
     public updatedAt: Date,
     public readonly termsAcceptedAt: Date,

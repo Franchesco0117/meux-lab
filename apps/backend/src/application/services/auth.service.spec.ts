@@ -37,7 +37,7 @@ class FakePasswordHasher implements IPasswordHasher {
     return `hashed_${plainPassword}`;
   }
 
-  async compare(plainPassword: string, hashedValue: string): Promise<boolean> {
+  async verify(plainPassword: string, hashedValue: string): Promise<boolean> {
     return hashedValue === `hashed_${plainPassword}`;
   }
 }
