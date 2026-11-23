@@ -73,7 +73,7 @@ describe("RegisterScreen", () => {
     expect(submitButton).toHaveAttribute("aria-disabled", "false");
   });
 
-  it.only("submits the data and navigates to /dashboard when the backend responds with a 201 error", async () => {
+  it("submits the data and navigates to /dashboard when the backend responds with a 201 error", async () => {
     const user = userEvent.setup();
     registerUserMock.mockResolvedValueOnce({
       id: "1",
