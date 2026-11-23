@@ -1,0 +1,226 @@
+.register-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Cabecera ---------- */
+.register-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm) var(--spacing-md);
+  max-width: 1120px;
+  min-height: var(--header-height);
+  margin: 0 auto;
+  padding: var(--spacing-sm) var(--spacing-lg);
+}
+
+.register-header {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.register-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.register-logo-mark rect {
+  fill: var(--primary);
+}
+
+.register-logo-mark path {
+  stroke: var(--on-primary);
+}
+
+.register-login {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.register-link {
+  font-weight: 600;
+  color: var(--text-main);
+  text-decoration: underline; /* el enlace no depende solo del color */
+  text-underline-offset: 3px;
+}
+
+.register-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- Contenido ---------- */
+.register-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-lg) 6vh;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 36px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.register-title {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.register-subtitle {
+  margin: 0 0 18px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---------- Checkbox ---------- */
+.register-checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 0; /* total ≈ 44px de alto táctil */
+}
+
+.register-checkbox {
+  -webkit-appearance: none;
+  appearance: none;
+  flex-shrink: 0;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  background-color: var(--bg-input);
+  border: 1.5px solid var(--border-control);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.register-checkbox::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: var(--on-primary);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  transform: scale(0);
+  transition: transform 0.12s ease;
+}
+
+.register-checkbox:hover {
+  border-color: var(--text-main);
+}
+
+.register-checkbox:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.register-checkbox:checked::before {
+  transform: scale(1);
+}
+
+.register-checkbox-label {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.register-checkbox-label a {
+  font-weight: 600;
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.register-checkbox-label a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- Botón ---------- */
+.register-submit-btn {
+  width: 100%;
+  min-height: 52px;
+  margin-top: var(--spacing-xs);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--on-primary);
+  background-color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-field);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.register-submit-btn:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.register-submit-btn:active {
+  transform: translateY(1px);
+}
+
+.register-submit-btn--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.register-submit-btn--disabled:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ---------- Footer ---------- */
+.register-footer {
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+/* ---------- Móvil ---------- */
+@media (max-width: 480px) {
+  .register-header-inner {
+    padding: var(--spacing-md);
+  }
+
+  .register-main {
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-lg);
+  }
+
+  .register-card {
+    padding: 28px 20px;
+  }
+}

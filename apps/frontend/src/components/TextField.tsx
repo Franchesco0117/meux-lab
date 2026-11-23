@@ -1,4 +1,5 @@
-import React, { useId } from "react";
+import { useId, type Ref } from "react";
+import "./TextField.css";
 
 interface TextFieldProps {
   label: string;
@@ -7,38 +8,61 @@ interface TextFieldProps {
   error?: string;
   type?: string;
   placeholder?: string;
+  hint?: string;
+  autoComplete?: string;
+  inputRef?: Ref<HTMLInputElement>;
 }
 
-export const TextField: React.FC<TextFieldProps> = ({
+export const TextField = ({
   label,
   value,
   onChange,
   error,
   type = "text",
   placeholder,
-}) => {
+  hint,
+  autoComplete,
+  inputRef,
+}: TextFieldProps) => {
   const id = useId();
   const errorId = "${id}-error";
+  const hintId = "{id}-hint";
+
+  const describedby =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
+    undefined;
 
   return (
-    <div className="flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium">
+    <div className="field">
+      <label htmlFor={id} className="field-label">
         {label}
       </label>
-      <input
-        id={id}
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        aria-invalid={!!error}
-        aria-describedby={error ? errorId : undefined}
-        className="border p-2 rounded"
-      />
+
+      <div className="field-control">
+        <input
+          ref={inputRef}
+          id={id}
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          onChange={(e) => onChange(e.target.value)}
+          aria-invalid={!!error}
+          aria-describedby={describedby}
+          className="field-input"
+        />
+      </div>
+
+      {hint && (
+        <p id={hintId} className="field-hint">
+          {hint}
+        </p>
+      )}
+
       {error && (
-        <span id={errorId} className="text-red-500 text-sm">
+        <p id={errorId} className="field-error" role="alert">
           {error}
-        </span>
+        </p>
       )}
     </div>
   );

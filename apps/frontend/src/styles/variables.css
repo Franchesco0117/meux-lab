@@ -1,0 +1,106 @@
+:root {
+  color-scheme: light;
+
+  /* Superficies */
+  --bg-main: #f4f4f5;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+
+  /* Texto */
+  --text-main: #18181b; /* 16:1 */
+  --text-secondary: #3f3f46; /* 9.5:1 sobre --bg-main */
+  --text-placeholder: #52525b; /* 7.7:1 sobre blanco */
+
+  /* Acción principal */
+  --primary: #18181b;
+  --primary-hover: #3f3f46;
+  --on-primary: #ffffff;
+
+  /* Estado y foco */
+  --error: #991b1b; /* 8.3:1 sobre blanco */
+  --border-focus: #4f46e5; /* 6.3:1 sobre blanco (mínimo no textual: 3:1) */
+
+  /* Bordes */
+  --border-control: #71717a; /* 4.8:1: límite visible de inputs y checkbox */
+  --border-subtle: #e4e4e7; /* decorativo: contorno de la tarjeta */
+
+  /* Sombra de la tarjeta */
+  --shadow-card:
+    0 1px 2px rgba(24, 24, 27, 0.04), 0 16px 40px -16px rgba(24, 24, 27, 0.16);
+
+  /* Radios */
+  --radius-sm: 6px;
+  --radius-field: 10px;
+  --radius-card: 16px;
+
+  /* Espaciado */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Tamaño táctil mínimo */
+  --target-min: 44px;
+
+  --header-height: 64px;
+}
+
+/* TEMA DE ALTO CONTRASTE (WCAG AAA) */
+[data-theme="high-contrast"] {
+  color-scheme: dark;
+
+  --bg-main: #000000;
+  --bg-card: #000000;
+  --bg-input: #000000;
+
+  --text-main: #ffffff;
+  --text-secondary: #ffff00;
+  --text-placeholder: #d4d4d8;
+
+  --primary: #ffff00;
+  --primary-hover: #e6e600;
+  --on-primary: #000000;
+
+  --error: #ff6b6b; /* 7.5:1 sobre negro */
+  --border-focus: #ffff00;
+
+  --border-control: #ffffff;
+  --border-subtle: #ffffff;
+  --shadow-card: none;
+}
+
+/* Base global */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family:
+    Inter,
+    Roboto,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
