@@ -73,7 +73,7 @@ describe("RegisterScreen", () => {
     expect(submitButton).toHaveAttribute("aria-disabled", "false");
   });
 
-  it("submits the data and navigates to /dashboard when the backend responds with a 201 error", async () => {
+  it("submits the data and navigates to /dashboard when the backend responds with a 201", async () => {
     const user = userEvent.setup();
     registerUserMock.mockResolvedValueOnce({
       id: "1",
@@ -127,5 +127,22 @@ describe("RegisterScreen", () => {
 
     const results = await axe(container);
     expect(results).toHaveNoViolations();
+  });
+
+  it("it allows you to show and hide the password during registration without submitting the form", async () => {
+    const user = userEvent.setup();
+    renderRegisterScreen();
+
+    const passwordInput = screen.getByLabelText("Contraseña");
+    const toggleButton = screen.getByRole("button", {
+      name: "Mostrar contraseña",
+    });
+
+    await user.type(passwordInput, "secret123");
+    expect(passwordInput).toHaveAttribute("type", "password");
+
+    await user.click(toggleButton);
+    expect(passwordInput).toHaveAttribute("type", "text");
+    expect(registerUserMock).not.toHaveBeenCalled();
   });
 });
