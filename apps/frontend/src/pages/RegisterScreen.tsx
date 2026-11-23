@@ -6,6 +6,7 @@ import { AuthLayout } from "../layouts/AuthLayout";
 import { ApiError, registerUser } from "../services/auth.services";
 import "./RegisterScreen.css";
 import "../styles/variables.css";
+import { PasswordField } from "../components/PasswordField";
 
 export const RegisterScreen = () => {
   const navigate = useNavigate();
@@ -171,9 +172,8 @@ export const RegisterScreen = () => {
           inputRef={emailInputRef}
         />
 
-        <TextField
+        <PasswordField
           label="Contraseña"
-          type="password"
           value={password}
           onChange={(val) => {
             setPassword(val);
