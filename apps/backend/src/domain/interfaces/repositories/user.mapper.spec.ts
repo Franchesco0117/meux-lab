@@ -13,6 +13,8 @@ describe('UserRow', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       termsAcceptedAt: new Date(),
+      failedLoginAttempts: 0,
+      lockedUntil: null,
     };
 
     const domainEntity = toDomain(rawDataFromDb);
@@ -47,6 +49,8 @@ describe('UserRow', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       termsAcceptedAt: new Date(),
+      failedLoginAttempts: 0,
+      lockedUntil: null,
     };
 
     const domainEntity = toDomain(rawDataFromDb);
@@ -65,6 +69,8 @@ describe('UserRow', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       termsAcceptedAt: new Date(),
+      failedLoginAttempts: 0,
+      lockedUntil: null,
     };
 
     const domain = toDomain(originalRow);

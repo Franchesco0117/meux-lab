@@ -7,6 +7,8 @@ export interface UserRow {
   email: string;
   passwordHash: string;
   avatarUrl: string | null;
+  failedLoginAttempts: number;
+  lockedUntil: Date | null;
   createdAt: Date;
   updatedAt: Date;
   termsAcceptedAt: Date;
@@ -24,6 +26,8 @@ export function toDomain(row: UserRow): User {
     row.createdAt,
     row.updatedAt,
     row.termsAcceptedAt,
+    row.failedLoginAttempts ?? 0,
+    row.lockedUntil ?? null,
   );
 }
 
@@ -34,6 +38,8 @@ export function toPersistence(user: User): UserRow {
     email: user.email.value,
     passwordHash: user.passwordHash,
     avatarUrl: user.avatarUrl ?? null,
+    failedLoginAttempts: user.failedLoginAttempts,
+    lockedUntil: user.lockedUntil,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     termsAcceptedAt: user.termsAcceptedAt,
