@@ -7,6 +7,7 @@ import {
 import type { Response } from 'express';
 import { DomainError } from '../../domain/errors/domain.error.js';
 import { UserAlreadyExistsError } from '../../domain/errors/user-already-exists.error.js';
+import { AccountLockedError } from '../../domain/errors/account-locked.error.js';
 
 @Catch(DomainError)
 export class DomainExceptionFilter implements ExceptionFilter {
@@ -14,10 +15,13 @@ export class DomainExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const status =
-      error instanceof UserAlreadyExistsError
-        ? HttpStatus.CONFLICT
-        : HttpStatus.BAD_REQUEST;
+    let status = HttpStatus.BAD_REQUEST;
+
+    if (error instanceof UserAlreadyExistsError) {
+      status = HttpStatus.CONFLICT;
+    } else if (error instanceof AccountLockedError) {
+      status = HttpStatus.TOO_MANY_REQUESTS;
+    }
 
     response.status(status).json({
       statusCode: status,

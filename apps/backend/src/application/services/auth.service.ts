@@ -8,6 +8,8 @@ import { WeakPasswordError } from '../../domain/errors/weak-password.error.js';
 import { UserAlreadyExistsError } from '../../domain/errors/user-already-exists.error.js';
 import { InvalidCredentialsError } from '../../domain/errors/invalid-credentials.error.js';
 import type { ITokenService } from '../../domain/interfaces/token.service.interface.js';
+import { AccountLockedError } from '../../domain/errors/account-locked.error.js';
+import type { Clock } from '../../domain/entities/user.entity.js';
 
 export interface LoginInput {
   email: string;
@@ -50,6 +52,8 @@ export class AuthService {
     private readonly userReader: IAuthUserReader,
     private readonly passwordVerifier: IPasswordVerifier,
     private readonly tokenService: ITokenService,
+
+    private readonly clock: Clock = () => new Date(),
   ) {}
 
   async register(dto: RegisterDto): Promise<User> {
@@ -91,29 +95,45 @@ export class AuthService {
 
   async login(input: LoginInput): Promise<LoginOutput> {
     const normalized = Email.create(input.email);
-    const user = await this.userReader.findByEmail(normalized);
+    const domainUser = await this.userRepository.findByEmail(normalized);
 
-    const hashToVerift = user ? user.passwordHash : DUMMY_ARGON2_HASH;
+    if (domainUser?.isLocked(this.clock)) {
+      throw new AccountLockedError(domainUser.lockedUntil);
+    }
+
+    const hashToVerify = domainUser
+      ? domainUser.passwordHash
+      : DUMMY_ARGON2_HASH;
+
     const isPasswordValid = await this.passwordVerifier.verify(
       input.password,
-      hashToVerift,
+      hashToVerify,
     );
 
-    if (!user || !isPasswordValid) {
+    if (!domainUser) {
       throw new InvalidCredentialsError();
     }
 
+    if (!isPasswordValid) {
+      domainUser.recordFailedLogin(this.clock);
+      await this.userRepository.save(domainUser);
+      throw new InvalidCredentialsError();
+    }
+
+    domainUser.recordSuccessfulLogin(this.clock);
+    await this.userRepository.save(domainUser);
+
     const accessToken = await this.tokenService.signAccessToken({
-      sub: user.id,
-      email: user.email.value,
+      sub: domainUser.id,
+      email: domainUser.email.value,
     });
 
     return {
       accessToken,
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        id: domainUser.id,
+        name: domainUser.name,
+        email: domainUser.email,
       },
     };
   }

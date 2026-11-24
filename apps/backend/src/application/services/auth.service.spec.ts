@@ -1,4 +1,5 @@
 import { User } from '../../domain/entities/user.entity.js';
+import { AccountLockedError } from '../../domain/errors/account-locked.error.js';
 import { InvalidCredentialsError } from '../../domain/errors/invalid-credentials.error.js';
 import { UserAlreadyExistsError } from '../../domain/errors/user-already-exists.error.js';
 import { WeakPasswordError } from '../../domain/errors/weak-password.error.js';
@@ -180,15 +181,21 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('returns accessToken and user info when credentials are valid', async () => {
+      const now = new Date('2026-11-23T18:00:00.000Z');
       const email = Email.create('login@mail.com');
       const hashedPassword = await passwordHasher.hash('secretpass123');
 
-      userReader.setUser({
-        id: 'user-10',
-        name: 'Login User',
+      const user = new User(
+        'user-10',
+        'Login User',
         email,
-        passwordHash: hashedPassword,
-      });
+        hashedPassword,
+        null,
+        now,
+        now,
+        now,
+      );
+      await userRepository.save(user);
 
       const result = await authService.login({
         email: 'LOGIN@mail.com',
@@ -236,5 +243,103 @@ describe('AuthService', () => {
         }),
       ).rejects.toThrow(InvalidCredentialsError);
     });
+
+    it('locks account after 5 failed attempts and rejects valid password while locked', async () => {
+      let currentTime = new Date('2026-11-23T18:00:00.000Z');
+      const clock = () => currentTime;
+      const serviceWithClock = new AuthService(
+        userRepository,
+        passwordHasher,
+        userReader,
+        passwordVerifier,
+        tokenService,
+        clock,
+      );
+
+      const email = Email.create('lock@mail.com');
+      const hashedPassword = await passwordHasher.hash('secretpass123');
+
+      const user = new User(
+        'user-10',
+        'Login User',
+        email,
+        hashedPassword,
+        null,
+        currentTime,
+        currentTime,
+        currentTime,
+      );
+      await userRepository.save(user);
+
+      for (let i = 0; i < 5; i++) {
+        await expect(
+          serviceWithClock.login({
+            email: 'lock@mail.com',
+            password: 'WrongPassword123',
+          }),
+        ).rejects.toThrow(InvalidCredentialsError);
+      }
+
+      // 10 minutos despues: sigue bloqueada incluso con contraseña valida
+      currentTime = new Date(currentTime.getTime() + 10 * 60 * 1000);
+
+      await expect(
+        serviceWithClock.login({
+          email: 'lock@mail.com',
+          password: 'secretpass123',
+        }),
+      ).rejects.toThrow(AccountLockedError);
+    });
+  });
+
+  it('allows login after 30 minutes and resets failed attempts on success', async () => {
+    let currentTime = new Date('2026-11-23T18:00:00.000Z');
+    const clock = () => currentTime;
+    const serviceWithClock = new AuthService(
+      userRepository,
+      passwordHasher,
+      userReader,
+      passwordVerifier,
+      tokenService,
+      clock,
+    );
+
+    const email = Email.create('recover@mail.com');
+    const hashedPassword = await passwordHasher.hash('secretpass123');
+
+    const user = new User(
+      'user-10',
+      'Login User',
+      email,
+      hashedPassword,
+      null,
+      currentTime,
+      currentTime,
+      currentTime,
+    );
+    await userRepository.save(user);
+
+    for (let i = 0; i < 5; i++) {
+      await expect(
+        serviceWithClock.login({
+          email: 'recover@mail.com',
+          password: 'WrongPassword123',
+        }),
+      ).rejects.toThrow(InvalidCredentialsError);
+    }
+
+    // Avanza 30 minutos exactos
+    currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
+
+    const result = await serviceWithClock.login({
+      email: 'recover@mail.com',
+      password: 'secretpass123',
+    });
+
+    expect(result.accessToken).toContain('_recover@mail.com');
+
+    const updatedUser = await userRepository.findByEmail(email);
+    expect(updatedUser?.failedLoginAttempts).toBe(0);
+    expect(updatedUser?.lockedUntil).toBeNull();
   });
 });
