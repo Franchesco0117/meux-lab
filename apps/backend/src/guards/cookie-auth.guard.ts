@@ -18,6 +18,8 @@ export interface AuthenticatedRequest extends Request {
   };
 }
 
+const AUTH_COOKIE_NAME = 'meux_session';
+
 @Injectable()
 export class CookieAuthGuard implements CanActivate {
   constructor(
@@ -27,7 +29,7 @@ export class CookieAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const token = req.cookies?.access_token;
+    const token = req.cookies?.[AUTH_COOKIE_NAME];
 
     if (!token || typeof token !== 'string') {
       throw new UnauthorizedException('Sesión no válida o expirada.');

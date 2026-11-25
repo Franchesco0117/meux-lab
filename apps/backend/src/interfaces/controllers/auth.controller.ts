@@ -27,7 +27,7 @@ import { UserResponseDto } from '../dtos/user-response.dto.js';
 import { RegisterDto } from '../dtos/register.dto.js';
 import { LoginDto } from '../dtos/login.dto.js';
 
-const AUTH_COOKIE_NAME = 'access_token';
+const AUTH_COOKIE_NAME = 'meux_session';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -114,5 +114,16 @@ export class AuthController {
         email: user.email.value,
       },
     };
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Res({ passthrough: true }) res: Response): Promise<void> {
+    res.clearCookie(AUTH_COOKIE_NAME, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
   }
 }

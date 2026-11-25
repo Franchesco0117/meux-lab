@@ -108,3 +108,19 @@ export async function fetchCurrentUser(): Promise<AuthUser> {
 
   return (data?.user ?? data) as AuthUser;
 }
+
+export async function logoutUser(): Promise<void> {
+  const response = await fetch(`${API_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    const message = Array.isArray(data?.message)
+      ? data.message.join(". ")
+      : data?.message || "No se pudo cerrar sesión.";
+
+    throw new ApiError(response.status, message);
+  }
+}
