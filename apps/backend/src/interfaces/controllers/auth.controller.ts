@@ -25,11 +25,7 @@ import {
 } from '../../guards/cookie-auth.guard.js';
 import { UserResponseDto } from '../dtos/user-response.dto.js';
 import { RegisterDto } from '../dtos/register.dto.js';
-
-interface LoginBodyDto {
-  email: string;
-  password: string;
-}
+import { LoginDto } from '../dtos/login.dto.js';
 
 const AUTH_COOKIE_NAME = 'access_token';
 
@@ -62,7 +58,7 @@ export class AuthController {
     description: 'Inicio de sesión exitoso; cookie httpOnly establecida.',
   })
   async login(
-    @Body() body: LoginBodyDto,
+    @Body() body: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     try {

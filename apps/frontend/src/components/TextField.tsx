@@ -25,12 +25,8 @@ export const TextField = ({
   inputRef,
 }: TextFieldProps) => {
   const id = useId();
-  const errorId = "${id}-error";
-  const hintId = "{id}-hint";
-
-  const describedby =
-    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
-    undefined;
+  const messageId = `${id}-message`;
+  const message = error ?? hint;
 
   return (
     <div className="field">
@@ -48,20 +44,19 @@ export const TextField = ({
           autoComplete={autoComplete}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={!!error}
-          aria-describedby={describedby}
+          aria-describedby={message ? messageId : undefined}
           className="field-input"
         />
       </div>
 
-      {hint && (
-        <p id={hintId} className="field-hint">
-          {hint}
-        </p>
-      )}
-
-      {error && (
-        <p id={errorId} className="field-error" role="alert">
-          {error}
+      {message && (
+        <p
+          key={error ? "error" : "hint"}
+          id={messageId}
+          className={error ? "field-error" : "field-hint"}
+          role={error ? "alert" : undefined}
+        >
+          {message}
         </p>
       )}
     </div>

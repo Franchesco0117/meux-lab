@@ -30,58 +30,34 @@ export const RegisterScreen = () => {
 
   const trimmedName = name.trim();
   const trimmedEmail = email.trim();
-  const isFormValid =
-    trimmedName.length > 0 &&
-    trimmedEmail.length > 0 &&
-    password.length >= 8 &&
-    termsAccepted;
 
-  const getMissingRequirementsText = (): string => {
-    const missing: string[] = [];
-    if (!trimmedName) missing.push("Nombre");
-    if (!trimmedEmail) missing.push("Correo electrónico");
-    if (password.length < 8) missing.push("Contraseña (mínimo 8 caracteres)");
-    if (!termsAccepted)
-      missing.push("Aceptar Términos y Condiciones y Política de Privacidad");
-    return `Completa para habilitar Registrar: ${missing.join(", ")}.`;
-  };
+  const PASSWORD_RULE = "La contraseña debe tener al menos 8 caracteres.";
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!isFormValid || isSubmitting) {
-      return;
-    }
+    if (isSubmitting) return;
 
-    setNameError(undefined);
-    setEmailError(undefined);
-    setPasswordError(undefined);
-    setTermsError(undefined);
+    const nameMissing = !trimmedName;
+    const emailMissing = !trimmedEmail;
+    const passwordShort = password.length < 8;
+    const termsMissing = !termsAccepted;
+
+    setNameError(nameMissing ? "Ingresa tu nombre." : undefined);
+    setEmailError(emailMissing ? "Ingresa tu correo electrónico." : undefined);
+    setPasswordError(passwordShort ? PASSWORD_RULE : undefined);
+    setTermsError(
+      termsMissing
+        ? "Debes aceptar los Términos y Condiciones y la Política de Privacidad."
+        : undefined,
+    );
     setGeneralError(null);
 
-    if (!trimmedName) {
-      setNameError("Ingresa tu nombre.");
-      nameInputRef.current?.focus();
-      return;
-    }
-
-    if (!trimmedEmail) {
-      setEmailError("Ingresa tu correo electrónico.");
-      emailInputRef.current?.focus();
-      return;
-    }
-
-    if (password.length < 8) {
-      setPasswordError("La contraseña debe tener al menos 8 caracteres.");
-      passwordInputRef.current?.focus();
-      return;
-    }
-
-    if (!termsAccepted) {
-      setTermsError(
-        "Debes aceptar los Términos y Condiciones y la Política de Privacidad.",
-      );
-      emailInputRef.current?.focus();
+    if (nameMissing || emailMissing || passwordShort || termsMissing) {
+      if (nameMissing) nameInputRef.current?.focus();
+      else if (emailMissing) emailInputRef.current?.focus();
+      else if (passwordShort) passwordInputRef.current?.focus();
+      else emailInputRef.current?.focus();
       return;
     }
 
@@ -114,8 +90,6 @@ export const RegisterScreen = () => {
     } finally {
       setIsSubmitting(false);
     }
-
-    console.log({ name, email, password, termsAccepted });
   };
 
   return (
@@ -180,7 +154,7 @@ export const RegisterScreen = () => {
             if (passwordError) setPasswordError(undefined);
           }}
           placeholder="Ingresa tu contraseña"
-          hint="La contraseña debe tener al menos 8 caracteres."
+          hint={PASSWORD_RULE}
           autoComplete="new-password"
           error={passwordError}
           inputRef={passwordInputRef}
@@ -202,15 +176,11 @@ export const RegisterScreen = () => {
           }
         />
 
-        {!isFormValid && (
-          <p className="field-hint">{getMissingRequirementsText()}</p>
-        )}
-
         <button
           type="submit"
-          aria-disabled={!isFormValid || isSubmitting}
+          aria-disabled={isSubmitting}
           className={`register-submit-btn ${
-            !isFormValid || isSubmitting ? "register-submit-btn--disabled" : ""
+            isSubmitting ? "register-submit-btn--disabled" : ""
           }`}
         >
           Registrar

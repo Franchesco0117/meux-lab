@@ -1,18 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthLayout } from "./layouts/AuthLayout";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { RegisterScreen } from "./pages/RegisterScreen";
-
-const LoginPlaceHolderScreen = () => (
-  <AuthLayout title="Iniciar sesión - MEUX LAB" heading="Iniciar sesión">
-    <p className="field-hint">Paantalla de inicio de sesión (proximamente!).</p>
-  </AuthLayout>
-);
-
-const DashboardPlaceHolderScreen = () => (
-  <AuthLayout title="Dashboard - MEUX LAB" heading="Dashboard principal">
-    <p className="field-hint">Bienvenido a MEUX LAB.</p>
-  </AuthLayout>
-);
+import { LoginScreen } from "./pages/LoginScreen";
+import { DashboardScreen } from "./pages/DashboardScreen";
 
 export function App() {
   return (
@@ -20,8 +9,8 @@ export function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/register" replace />} />
         <Route path="/register" element={<RegisterScreen />} />
-        <Route path="/login" element={<LoginPlaceHolderScreen />} />
-        <Route path="/dashboard" element={<DashboardPlaceHolderScreen />} />
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/dashboard" element={<DashboardScreen />} />
       </Routes>
     </BrowserRouter>
   );

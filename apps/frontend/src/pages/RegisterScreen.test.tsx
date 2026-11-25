@@ -46,33 +46,6 @@ describe("RegisterScreen", () => {
     vi.clearAllMocks();
   });
 
-  it('keeps the register button active with aria-diasbled="true" until the form is completed and prevents submission with Enter', async () => {
-    const user = userEvent.setup();
-    renderRegisterScreen();
-
-    const submitButton = screen.getByRole("button", { name: "Registrar" });
-    expect(submitButton).toHaveAttribute("aria-disabled", "true");
-
-    const nameInput = screen.getByLabelText("Nombre");
-    await user.type(nameInput, "User{Enter}");
-
-    expect(registerUserMock).not.toHaveBeenCalled();
-    expect(submitButton).toHaveAttribute("aria-disabled", "true");
-
-    await user.type(
-      screen.getByLabelText("Correo electrónico"),
-      "user@MediaList.com",
-    );
-    await user.type(screen.getByLabelText("Contraseña"), "secret123");
-    await user.click(
-      screen.getByRole("checkbox", {
-        name: /He leído y acepto los Términos y Condiciones y la Política de Privacidad/i,
-      }),
-    );
-
-    expect(submitButton).toHaveAttribute("aria-disabled", "false");
-  });
-
   it("submits the data and navigates to /dashboard when the backend responds with a 201", async () => {
     const user = userEvent.setup();
     registerUserMock.mockResolvedValueOnce({
