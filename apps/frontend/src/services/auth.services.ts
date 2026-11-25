@@ -12,6 +12,25 @@ export interface RegisterResponse {
   createdAt: string;
 }
 
+export interface LoginPayLoad {
+  email: string;
+  password: string;
+}
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  createdAt?: string;
+}
+
+export interface LoginResponse {
+  user?: AuthUser;
+  id?: string;
+  name?: string;
+  email?: string;
+}
+
 export class ApiError extends Error {
   public readonly status: number;
 
@@ -46,4 +65,46 @@ export async function registerUser(
   }
 
   return data as RegisterResponse;
+}
+
+export async function loginUser(payload: LoginPayLoad): Promise<LoginResponse> {
+  const response = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const message = Array.isArray(data?.message)
+      ? data.message.join(". ")
+      : data?.message || "No se pudo iniciar sesión.";
+
+    throw new ApiError(response.status, message);
+  }
+
+  return (data ?? {}) as LoginResponse;
+}
+
+export async function fetchCurrentUser(): Promise<AuthUser> {
+  const response = await fetch(`${API_URL}/auth/me`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const message = Array.isArray(data?.message)
+      ? data.message.join(". ")
+      : data?.message || "No hay sesión activa.";
+
+    throw new ApiError(response.status, message);
+  }
+
+  return (data?.user ?? data) as AuthUser;
 }

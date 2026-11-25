@@ -15,29 +15,31 @@ const trim = ({ value }: { value: unknown }): unknown =>
 export class RegisterDto {
   @ApiProperty({ example: 'User' })
   @Transform(trim)
-  @IsString()
-  @MinLength(2)
-  @MaxLength(100)
+  @IsString({ message: 'El nombre debe ser un texto válido' })
+  @MinLength(2, { message: 'El nombre debe tener al menos 2 caracteres' })
+  @MaxLength(100, { message: 'El nombre no puede superar los 100 caracteres' })
   name!: string;
 
   @ApiProperty({ example: 'user@mail.com' })
   @Transform(trim)
-  @IsEmail()
+  @IsEmail({}, { message: 'Ingresa un correo electrónico válido' })
   email!: string;
 
   @ApiProperty({ minLength: 8, example: 'SuperSecurePassword123' })
-  @IsString()
-  @MinLength(8)
-  @MaxLength(128)
+  @IsString({ message: 'La contraseña debe ser un texto válido' })
+  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
+  @MaxLength(128, {
+    message: 'La contraseña no puede superar los 128 caracteres',
+  })
   password!: string;
 
   @ApiProperty({
     example: true,
-    description: 'You must acccept the terms and conditions',
+    description: 'Debes aceptar los términos y condiciones',
   })
-  @IsBoolean()
+  @IsBoolean({ message: 'Debes indicar si aceptas los términos y condiciones' })
   @Equals(true, {
-    message: 'You must acccept the terms and conditions to continue',
+    message: 'Debes aceptar los términos y condiciones para continuar',
   })
   termsAccepted!: boolean;
 }

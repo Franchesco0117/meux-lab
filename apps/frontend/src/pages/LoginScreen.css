@@ -1,0 +1,26 @@
+.login-general-error {
+  margin: 0 0 var(--spacing-md);
+}
+
+.login-options {
+  display: flex;
+  flex-wrap: wrap; /* en pantallas muy angostas el enlace baja a otra línea */
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xs) var(--spacing-md);
+}
+
+.login-forgot {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.login-forgot:hover {
+  text-decoration-thickness: 2px;
+}

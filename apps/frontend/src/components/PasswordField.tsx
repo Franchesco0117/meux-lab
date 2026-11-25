@@ -1,4 +1,11 @@
-import { useCallback, useId, useRef, useState, type Ref } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type Ref,
+  useImperativeHandle,
+} from "react";
 import "./TextField.css";
 
 interface PasswordFieldProps {
@@ -58,44 +65,30 @@ export const PasswordField = ({
   inputRef,
 }: PasswordFieldProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [inputElement, setInputElement] = useState<HTMLInputElement | null>(
-    null,
-  );
-  const forwardedRefCleanupRef = useRef<(() => void) | null>(null);
+  const shouldRestoreFocusRef = useRef(false);
+  const internalInputRef = useRef<HTMLInputElement>(null);
 
   const id = useId();
-  const errorId = `${id}-error`;
-  const hintId = `${id}-hint`;
+  const messageId = `${id}-message`;
 
-  const describedBy =
-    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
-    undefined;
+  const message = error ?? hint;
+  const toggleLabel = isVisible ? "Ocultar contraseña" : "Mostrar contraseña";
 
-  const handleRef = useCallback(
-    (node: HTMLInputElement | null) => {
-      setInputElement(node);
-
-      forwardedRefCleanupRef.current?.();
-      forwardedRefCleanupRef.current = null;
-
-      if (!inputRef) return;
-
-      if (typeof inputRef === "function") {
-        const cleanup = inputRef(node);
-        if (typeof cleanup === "function") {
-          forwardedRefCleanupRef.current = cleanup;
-        }
-      }
-    },
-    [inputRef],
+  useImperativeHandle(
+    inputRef,
+    () => internalInputRef.current as HTMLInputElement,
   );
 
-  const handleToggleVisibility = () => {
-    setIsVisible((prev) => !prev);
-    inputElement?.focus();
-  };
+  useEffect(() => {
+    if (!shouldRestoreFocusRef.current) return;
+    shouldRestoreFocusRef.current = false;
+    internalInputRef.current?.focus();
+  }, [isVisible]);
 
-  const toggleLabel = isVisible ? "Ocultar contraseña" : "Mostrar contraseña";
+  const handleToggleVisibility = () => {
+    shouldRestoreFocusRef.current = true;
+    setIsVisible((prev) => !prev);
+  };
 
   return (
     <div className="field">
@@ -105,9 +98,7 @@ export const PasswordField = ({
 
       <div className="field-control">
         <input
-          ref={
-            inputRef && typeof inputRef !== "function" ? inputRef : handleRef
-          }
+          ref={internalInputRef}
           id={id}
           type={isVisible ? "text" : "password"}
           value={value}
@@ -115,7 +106,7 @@ export const PasswordField = ({
           autoComplete={autoComplete}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={!!error}
-          aria-describedby={describedBy}
+          aria-describedby={message ? messageId : undefined}
           className="field-input field-input--password"
         />
 
@@ -129,15 +120,14 @@ export const PasswordField = ({
         </button>
       </div>
 
-      {hint && (
-        <p id={hintId} className="field-hint">
-          {hint}
-        </p>
-      )}
-
-      {error && (
-        <p id={errorId} className="field-error" role="alert">
-          {error}
+      {message && (
+        <p
+          key={error ? "error" : "hint"}
+          id={messageId}
+          className={error ? "field-error" : "field-hint"}
+          role={error ? "alert" : undefined}
+        >
+          {message}
         </p>
       )}
     </div>
