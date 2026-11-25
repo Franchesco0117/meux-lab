@@ -1,0 +1,88 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.app-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  align-self: stretch;
+  min-width: 0;
+  padding: var(--spacing-lg);
+}
+
+.app-main:focus {
+  outline: none;
+}
+
+.app-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  .app-main {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ---------- Carga y error de sesión ---------- */
+.app-status {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.app-status-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  max-width: 360px;
+}
+
+.app-status-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.app-status-text {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.app-status-btn {
+  min-height: var(--target-min);
+  padding: 0 var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--on-primary);
+  background-color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-field);
+  cursor: pointer;
+}
+
+.app-status-btn:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
