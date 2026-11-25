@@ -1,0 +1,20 @@
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--target-min);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.brand-logo-mark rect {
+  fill: var(--primary);
+}
+
+.brand-logo-mark path {
+  stroke: var(--on-primary);
+}
